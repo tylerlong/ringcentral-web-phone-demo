@@ -14,6 +14,10 @@ const config: Configuration = {
         test: /\.tsx?$/,
         loader: 'ts-loader',
       },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   plugins: [new HtmlWebpackPlugin()],
