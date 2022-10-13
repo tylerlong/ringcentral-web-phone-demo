@@ -4,6 +4,7 @@
     "serve": "webpack serve"
   },
   "dependencies": {
+    "@rc-ex/core": "^0.15.0",
     "antd": "^4.23.5",
     "localforage": "^1.10.0",
     "react": "^18.2.0",

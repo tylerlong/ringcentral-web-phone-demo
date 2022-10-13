@@ -1,7 +1,8 @@
-import React, {useEffect} from 'react';
 import 'antd/dist/antd.css';
-import {Button, Form, Input, Select} from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Button, Form, Input, message, Select} from 'antd';
 import localforage from 'localforage';
+import RingCentral from '@rc-ex/core';
 
 class LoginForm {
   serverUrl!: string;
@@ -12,12 +13,35 @@ class LoginForm {
   password!: string;
 }
 
+let rc: RingCentral;
+
 const App = () => {
   const login = async (loginForm: LoginForm) => {
     await localforage.setItem('wp-login-form', loginForm);
+    rc = new RingCentral({
+      server: loginForm.serverUrl,
+      clientId: loginForm.clientId,
+      clientSecret: loginForm.clientSecret,
+    });
+    await rc.authorize({
+      username: loginForm.username,
+      extension: loginForm.extension,
+      password: loginForm.password,
+    });
+    message.success('You have logged in!');
+    setLoggedIn(true);
+  };
+
+  const logout = () => {
+    setLoggedIn(false);
+    if (rc !== undefined) {
+      rc.revoke();
+    }
+    message.success('You have logged out!');
   };
 
   const [form] = Form.useForm();
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -29,71 +53,79 @@ const App = () => {
   return (
     <>
       <h1>RingCentral Web Phone Demo</h1>
-      <Form
-        name="basic"
-        labelCol={{span: 8}}
-        wrapperCol={{span: 8}}
-        onFinish={login}
-        autoComplete="off"
-        form={form}
-      >
-        <Form.Item
-          label="Server URL"
-          name="serverUrl"
-          rules={[{required: true, message: 'Please input the Server URL!'}]}
+      {loggedIn ? (
+        <>
+          <Button onClick={logout}>Log out</Button>
+        </>
+      ) : (
+        <Form
+          name="basic"
+          labelCol={{span: 8}}
+          wrapperCol={{span: 8}}
+          onFinish={login}
+          autoComplete="off"
+          form={form}
         >
-          <Select>
-            <Select.Option value="https://platform.ringcentral.com">
-              https://platform.ringcentral.com
-            </Select.Option>
-            <Select.Option value="https://platform.devtest.ringcentral.com">
-              https://platform.devtest.ringcentral.com
-            </Select.Option>
-          </Select>
-        </Form.Item>
+          <Form.Item
+            label="Server URL"
+            name="serverUrl"
+            rules={[{required: true, message: 'Please input the Server URL!'}]}
+          >
+            <Select>
+              <Select.Option value="https://platform.ringcentral.com">
+                https://platform.ringcentral.com
+              </Select.Option>
+              <Select.Option value="https://platform.devtest.ringcentral.com">
+                https://platform.devtest.ringcentral.com
+              </Select.Option>
+            </Select>
+          </Form.Item>
 
-        <Form.Item
-          label="Client Id"
-          name="clientId"
-          rules={[{required: true, message: 'Please input the Client Id!'}]}
-        >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            label="Client Id"
+            name="clientId"
+            rules={[{required: true, message: 'Please input the Client Id!'}]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Client Secret"
-          name="clientSecret"
-          rules={[{required: true, message: 'Please input the Client Secret!'}]}
-        >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            label="Client Secret"
+            name="clientSecret"
+            rules={[
+              {required: true, message: 'Please input the Client Secret!'},
+            ]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Username"
-          name="username"
-          rules={[{required: true, message: 'Please input the Username!'}]}
-        >
-          <Input />
-        </Form.Item>
+          <Form.Item
+            label="Username"
+            name="username"
+            rules={[{required: true, message: 'Please input the Username!'}]}
+          >
+            <Input />
+          </Form.Item>
 
-        <Form.Item label="Extension" name="extension">
-          <Input />
-        </Form.Item>
+          <Form.Item label="Extension" name="extension">
+            <Input />
+          </Form.Item>
 
-        <Form.Item
-          label="Password"
-          name="password"
-          rules={[{required: true, message: 'Please input the Password!'}]}
-        >
-          <Input.Password />
-        </Form.Item>
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{required: true, message: 'Please input the Password!'}]}
+          >
+            <Input.Password />
+          </Form.Item>
 
-        <Form.Item wrapperCol={{offset: 8, span: 8}}>
-          <Button type="primary" htmlType="submit">
-            Login
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item wrapperCol={{offset: 8, span: 8}}>
+            <Button type="primary" htmlType="submit">
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
+      )}
     </>
   );
 };
