@@ -6,7 +6,7 @@ const config: Configuration = {
   mode: 'development',
   entry: './src/index.tsx',
   resolve: {
-    extensions: ['.ts', 'tsx', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
   },
   module: {
     rules: [
