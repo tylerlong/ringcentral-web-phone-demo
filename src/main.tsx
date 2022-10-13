@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, message, Select} from 'antd';
 import localforage from 'localforage';
 import RingCentral from '@rc-ex/core';
+import WebPhone from 'ringcentral-web-phone';
 
 class LoginForm {
   serverUrl!: string;
@@ -14,9 +15,17 @@ class LoginForm {
 }
 
 let rc: RingCentral;
+let loginForm: LoginForm;
+const remoteVideoElement = document.getElementById(
+  'remote-video'
+) as HTMLVideoElement;
+const localVideoElement = document.getElementById(
+  'local-video'
+) as HTMLVideoElement;
 
 const App = () => {
-  const login = async (loginForm: LoginForm) => {
+  const login = async (_loginForm: LoginForm) => {
+    loginForm = _loginForm;
     await localforage.setItem('wp-login-form', loginForm);
     rc = new RingCentral({
       server: loginForm.serverUrl,
@@ -30,6 +39,7 @@ const App = () => {
     });
     message.success('You have logged in!');
     setLoggedIn(true);
+    await postLogin();
   };
 
   const logout = () => {
@@ -38,6 +48,39 @@ const App = () => {
       rc.revoke();
     }
     message.success('You have logged out!');
+  };
+
+  const postLogin = async () => {
+    const sipInfo = await rc
+      .restapi()
+      .clientInfo()
+      .sipProvision()
+      .post({
+        sipInfo: [
+          {
+            transport: 'WSS',
+          },
+        ],
+      });
+    const webPhone = new WebPhone(sipInfo as any, {
+      enableDscp: true,
+      clientId: loginForm.clientId,
+      audioHelper: {
+        enabled: true,
+        incoming: 'audio/incoming.ogg',
+        outgoing: 'audio/outgoing.ogg',
+      },
+      logLevel: 0,
+      appName: 'NewWebPhoneDemo',
+      appVersion: '0.1.0',
+      media: {
+        remote: remoteVideoElement,
+        local: localVideoElement,
+      },
+      enableQos: true,
+      enableMediaReportLogging: true,
+    });
+    console.log(webPhone.userAgent);
   };
 
   const [form] = Form.useForm();
@@ -55,6 +98,8 @@ const App = () => {
       <h1>RingCentral Web Phone Demo</h1>
       {loggedIn ? (
         <>
+          <video id="remote-video" hidden></video>
+          <video id="local-video" hidden muted></video>
           <Button onClick={logout}>Log out</Button>
         </>
       ) : (

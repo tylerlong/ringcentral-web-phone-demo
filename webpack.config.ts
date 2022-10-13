@@ -19,6 +19,12 @@ const config: Configuration = {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
     ],
   },
   plugins: [new HtmlWebpackPlugin()],

@@ -8,7 +8,8 @@
     "antd": "^4.23.5",
     "localforage": "^1.10.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "ringcentral-web-phone": "../ringcentral-web-phone"
   },
   "devDependencies": {
     "@types/node": "^18.8.5",
@@ -25,5 +26,10 @@
     "webpack-cli": "^4.10.0",
     "webpack-dev-server": "^4.11.1",
     "yarn-upgrade-all": "^0.7.1"
+  },
+  "yarn-upgrade-all": {
+    "ignore": [
+      "ringcentral-web-phone"
+    ]
   }
 }
