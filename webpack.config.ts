@@ -4,6 +4,7 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 
 const config: Configuration = {
   mode: 'development',
+  devtool: 'source-map',
   entry: './src/index.tsx',
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
