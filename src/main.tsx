@@ -109,6 +109,15 @@ const App = () => {
     })();
   });
 
+  const decline = (session: WebPhoneInvitation) => {
+    session.reject();
+    setSessions(sessions.filter(s => s.id !== session.id));
+  };
+  const toVoicemail = (session: WebPhoneInvitation) => {
+    session.toVoicemail!();
+    setSessions(sessions.filter(s => s.id !== session.id));
+  };
+
   return (
     <>
       <h1>RingCentral Web Phone Demo</h1>
@@ -116,11 +125,21 @@ const App = () => {
         <>
           <video id="remote-video" hidden></video>
           <video id="local-video" hidden muted></video>
-          <Button onClick={logout}>Log out</Button>
+          <Button onClick={logout} className="top-right">
+            Log out
+          </Button>
           {sessions.map(session => (
             <Card
-              style={{width: 300}}
-              actions={[<Button>Answer</Button>]}
+              style={{width: 400}}
+              actions={[
+                <Button type="primary">Answer</Button>,
+                <Button danger onClick={() => decline(session)}>
+                  Decline
+                </Button>,
+                <Button danger onClick={() => toVoicemail(session)}>
+                  To Voicemail
+                </Button>,
+              ]}
               key={session.id}
             >
               <Card.Meta

@@ -1,3 +1,9 @@
 body {
   padding: 1rem;
 }
+
+.top-right {
+  position: absolute !important;
+  top: 1rem;
+  right: 1rem;
+}
