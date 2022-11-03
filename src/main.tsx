@@ -1,12 +1,13 @@
 import 'antd/dist/antd.css';
 import React, {useEffect, useState} from 'react';
-import {Button, Form, Input, message, Select} from 'antd';
+import {Button, Form, Input, message, Select, Card} from 'antd';
 import localforage from 'localforage';
 import RingCentral from '@rc-ex/core';
 import WebPhone, {WebPhoneRegistrationData} from 'ringcentral-web-phone';
 
 import incomingAudio from '../assets/incoming.ogg';
 import outgoingAudio from '../assets/outgoing.ogg';
+import {WebPhoneInvitation} from 'ringcentral-web-phone/lib/session';
 
 class LoginForm {
   serverUrl!: string;
@@ -84,13 +85,22 @@ const App = () => {
       enableQos: true,
       enableMediaReportLogging: true,
     });
-    webPhone.userAgent.on!('invite', () => {
-      console.log('some one invite me');
+    webPhone.userAgent.on!('invite', onInvite);
+    webPhone.userAgent.transport.on!('switchBackProxy', () => {
+      webPhone.userAgent.transport.reconnect!();
     });
+  };
+
+  const onInvite = (session: WebPhoneInvitation) => {
+    console.log(session);
+    console.log('From', session.request.from.uri.user);
+    console.log('To', session.request.to.uri.user);
+    setSessions([...sessions, session]);
   };
 
   const [form] = Form.useForm();
   const [loggedIn, setLoggedIn] = useState(false);
+  const [sessions, setSessions] = useState<WebPhoneInvitation[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -107,6 +117,18 @@ const App = () => {
           <video id="remote-video" hidden></video>
           <video id="local-video" hidden muted></video>
           <Button onClick={logout}>Log out</Button>
+          {sessions.map(session => (
+            <Card
+              style={{width: 300}}
+              actions={[<Button>Answer</Button>]}
+              key={session.id}
+            >
+              <Card.Meta
+                title="Incoming call"
+                description={`From ${session.request.from.uri.user}`}
+              />
+            </Card>
+          ))}
         </>
       ) : (
         <Form
