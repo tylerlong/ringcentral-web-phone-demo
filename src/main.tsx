@@ -3,7 +3,10 @@ import React, {useEffect, useState} from 'react';
 import {Button, Form, Input, message, Select} from 'antd';
 import localforage from 'localforage';
 import RingCentral from '@rc-ex/core';
-import WebPhone from 'ringcentral-web-phone';
+import WebPhone, {WebPhoneRegistrationData} from 'ringcentral-web-phone';
+
+import incomingAudio from '../assets/incoming.ogg';
+import outgoingAudio from '../assets/outgoing.ogg';
 
 class LoginForm {
   serverUrl!: string;
@@ -48,6 +51,7 @@ const App = () => {
       rc.revoke();
     }
     message.success('You have logged out!');
+    window.location.reload(); // reload page to clear the state
   };
 
   const postLogin = async () => {
@@ -62,13 +66,13 @@ const App = () => {
           },
         ],
       });
-    const webPhone = new WebPhone(sipInfo as any, {
+    const webPhone = new WebPhone(sipInfo as WebPhoneRegistrationData, {
       enableDscp: true,
       clientId: loginForm.clientId,
       audioHelper: {
         enabled: true,
-        incoming: 'audio/incoming.ogg',
-        outgoing: 'audio/outgoing.ogg',
+        incoming: incomingAudio,
+        outgoing: outgoingAudio,
       },
       logLevel: 0,
       appName: 'NewWebPhoneDemo',
@@ -80,7 +84,9 @@ const App = () => {
       enableQos: true,
       enableMediaReportLogging: true,
     });
-    console.log(webPhone.userAgent);
+    webPhone.userAgent.on!('invite', () => {
+      console.log('some one invite me');
+    });
   };
 
   const [form] = Form.useForm();
@@ -141,7 +147,7 @@ const App = () => {
               {required: true, message: 'Please input the Client Secret!'},
             ]}
           >
-            <Input />
+            <Input.Password />
           </Form.Item>
 
           <Form.Item

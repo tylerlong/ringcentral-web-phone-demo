@@ -25,9 +25,17 @@ const config: Configuration = {
           fullySpecified: false,
         },
       },
+      {
+        test: /\.ogg$/,
+        type: 'asset/resource',
+      },
     ],
   },
-  plugins: [new HtmlWebpackPlugin()],
+  plugins: [
+    new HtmlWebpackPlugin({
+      favicon: './assets/favicon.ico',
+    }),
+  ],
 };
 
 export default config;
