@@ -20,12 +20,6 @@ class LoginForm {
 
 let rc: RingCentral;
 let loginForm: LoginForm;
-const remoteVideoElement = document.getElementById(
-  'remote-video'
-) as HTMLVideoElement;
-const localVideoElement = document.getElementById(
-  'local-video'
-) as HTMLVideoElement;
 
 const App = () => {
   const login = async (_loginForm: LoginForm) => {
@@ -79,8 +73,8 @@ const App = () => {
       appName: 'NewWebPhoneDemo',
       appVersion: '0.1.0',
       media: {
-        remote: remoteVideoElement,
-        local: localVideoElement,
+        remote: document.getElementById('remote-video') as HTMLVideoElement,
+        local: document.getElementById('local-video') as HTMLVideoElement,
       },
       enableQos: true,
       enableMediaReportLogging: true,
@@ -117,6 +111,10 @@ const App = () => {
     session.toVoicemail!();
     setSessions(sessions.filter(s => s.id !== session.id));
   };
+  const answer = async (session: WebPhoneInvitation) => {
+    await session.accept();
+    console.log(session.state);
+  };
 
   return (
     <>
@@ -132,7 +130,9 @@ const App = () => {
             <Card
               style={{width: 400}}
               actions={[
-                <Button type="primary">Answer</Button>,
+                <Button type="primary" onClick={() => answer(session)}>
+                  Answer
+                </Button>,
                 <Button danger onClick={() => decline(session)}>
                   Decline
                 </Button>,
