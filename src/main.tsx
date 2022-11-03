@@ -113,7 +113,11 @@ const App = () => {
   };
   const answer = async (session: WebPhoneInvitation) => {
     await session.accept();
-    console.log(session.state);
+    setSessions([...sessions]); // refresh GUI
+  };
+  const hangup = async (session: WebPhoneInvitation) => {
+    await session.dispose();
+    setSessions(sessions.filter(s => s.id !== session.id));
   };
 
   return (
@@ -129,17 +133,25 @@ const App = () => {
           {sessions.map(session => (
             <Card
               style={{width: 400}}
-              actions={[
-                <Button type="primary" onClick={() => answer(session)}>
-                  Answer
-                </Button>,
-                <Button danger onClick={() => decline(session)}>
-                  Decline
-                </Button>,
-                <Button danger onClick={() => toVoicemail(session)}>
-                  To Voicemail
-                </Button>,
-              ]}
+              actions={
+                session.state === 'Established'
+                  ? [
+                      <Button danger onClick={() => hangup(session)}>
+                        Hang Up
+                      </Button>,
+                    ]
+                  : [
+                      <Button type="primary" onClick={() => answer(session)}>
+                        Answer
+                      </Button>,
+                      <Button danger onClick={() => decline(session)}>
+                        Decline
+                      </Button>,
+                      <Button danger onClick={() => toVoicemail(session)}>
+                        To Voicemail
+                      </Button>,
+                    ]
+              }
               key={session.id}
             >
               <Card.Meta
