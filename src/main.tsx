@@ -119,6 +119,12 @@ const App = () => {
     await session.dispose();
     setSessions(sessions => sessions.filter(s => s.id !== session.id));
   };
+  const hold = async (session: WebPhoneInvitation) => {
+    await session.hold!();
+  };
+  const unhold = async (session: WebPhoneInvitation) => {
+    await session.unhold!();
+  };
 
   return (
     <>
@@ -139,6 +145,8 @@ const App = () => {
                       <Button danger onClick={() => hangup(session)}>
                         Hang Up
                       </Button>,
+                      <Button onClick={() => hold(session)}>Hold</Button>,
+                      <Button onClick={() => unhold(session)}>UnHold</Button>,
                     ]
                   : [
                       <Button type="primary" onClick={() => answer(session)}>
