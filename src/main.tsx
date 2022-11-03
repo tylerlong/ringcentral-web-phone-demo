@@ -89,7 +89,7 @@ const App = () => {
     console.log(session);
     console.log('From', session.request.from.uri.user);
     console.log('To', session.request.to.uri.user);
-    setSessions([...sessions, session]);
+    setSessions(sessions => [...sessions, session]);
   };
 
   const [form] = Form.useForm();
@@ -105,19 +105,19 @@ const App = () => {
 
   const decline = (session: WebPhoneInvitation) => {
     session.reject();
-    setSessions(sessions.filter(s => s.id !== session.id));
+    setSessions(sessions => sessions.filter(s => s.id !== session.id));
   };
   const toVoicemail = (session: WebPhoneInvitation) => {
     session.toVoicemail!();
-    setSessions(sessions.filter(s => s.id !== session.id));
+    setSessions(sessions => sessions.filter(s => s.id !== session.id));
   };
   const answer = async (session: WebPhoneInvitation) => {
     await session.accept();
-    setSessions([...sessions]); // refresh GUI
+    setSessions(sessions => [...sessions]); // refresh GUI
   };
   const hangup = async (session: WebPhoneInvitation) => {
     await session.dispose();
-    setSessions(sessions.filter(s => s.id !== session.id));
+    setSessions(sessions => sessions.filter(s => s.id !== session.id));
   };
 
   return (
