@@ -1,11 +1,15 @@
 /* eslint-disable node/no-unpublished-import */
 import {Configuration} from 'webpack';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
 
 const config: Configuration = {
   mode: 'development',
   devtool: 'source-map',
   entry: './src/index.tsx',
+  output: {
+    path: path.resolve(__dirname, 'docs'),
+  },
   resolve: {
     extensions: ['.ts', '.tsx', '.js'],
   },

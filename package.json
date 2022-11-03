@@ -1,7 +1,8 @@
 {
   "license": "MIT",
   "scripts": {
-    "serve": "webpack serve"
+    "serve": "webpack serve",
+    "release": "webpack"
   },
   "dependencies": {
     "@rc-ex/core": "^0.15.0",
