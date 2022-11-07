@@ -7,7 +7,10 @@ import WebPhone, {WebPhoneRegistrationData} from 'ringcentral-web-phone';
 
 import incomingAudio from '../assets/incoming.ogg';
 import outgoingAudio from '../assets/outgoing.ogg';
-import {WebPhoneInvitation} from 'ringcentral-web-phone/lib/session';
+import {
+  WebPhoneInvitation,
+  WebPhoneSession,
+} from 'ringcentral-web-phone/lib/session';
 
 class LoginForm {
   serverUrl!: string;
@@ -115,9 +118,19 @@ const App = () => {
     await session.accept();
     setSessions(sessions => [...sessions]); // refresh GUI
   };
-  const hangup = async (session: WebPhoneInvitation) => {
+  const hangup = async (session: WebPhoneSession) => {
     await session.dispose();
     setSessions(sessions => sessions.filter(s => s.id !== session.id));
+    for (const s of sessions) {
+      if (s.id !== session.id) {
+        // add track to another session
+        s.addTrack!(
+          document.getElementById('remote-video'),
+          document.getElementById('local-video')
+        );
+        break;
+      }
+    }
   };
   const hold = async (session: WebPhoneInvitation) => {
     await session.hold!();
